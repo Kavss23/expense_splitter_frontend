@@ -3,6 +3,9 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Home from './components/Home';
+import AddExpense from './components/AddExpense';
+import GroupDetail from './components/GroupDetail';
+import GroupList from './components/GroupList';
 import Logout1 from './components/Logout';
 
 const App = () => {
@@ -31,6 +34,9 @@ const App = () => {
         <Route path="/signup" element={isLoggedIn ? <Navigate to="/home" /> : <Signup onSignupSuccess={handleSignupSuccess} />} />
         <Route path="/home" element={isLoggedIn ? <Home /> : <Navigate to="/login" />} />
         <Route path="/logout" element={<Logout1 onLogout={handleLogout} />} />
+        <Route path="/groups" element={<GroupList />} />
+        <Route path="/groups/:groupId" element={<GroupDetail />} />
+        <Route path="/groups/:groupId/add-expense" element={<AddExpense />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </Router>

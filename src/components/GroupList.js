@@ -1,64 +1,97 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Typography, Container, Box } from '@mui/material';
+// components/Groups.js
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router';
+import { Button, List, ListItem, ListItemText, Typography, Box } from '@mui/material';
 
-const GroupList = ({ fetchGroups }) => {
+const GroupList = () => {
   const [groups, setGroups] = useState([]);
-  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchGroups = async () => {
-      try {
-        const token = localStorage.getItem('jwt_token');
-        const response = await axios.get('http://localhost:8040/api/groups/', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setGroups(response.data);
-      } catch (error) {
-        setError('Failed to fetch groups');
-      }
+      const response = await axios.get('http://localhost:7777/api/groups/', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
+        }
+      });
+      setGroups(response.data);
     };
-
     fetchGroups();
   }, []);
 
   const handleJoinGroup = async (groupId) => {
     try {
-      const token = localStorage.getItem('jwt_token');
       await axios.post(`http://localhost:7777/api/groups/${groupId}/join/`, {}, {
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
         }
       });
-      fetchGroups();
+      alert('Joined group successfully');
+      navigate(`/groups/${groupId}`);
     } catch (error) {
-      setError('Failed to join group');
+      console.error('Join group error:', error);
+      alert('Error joining group');
+    }
+  };
+
+  const handleCreateGroup = async () => {
+    const groupName = prompt('Enter group name:');
+    if (!groupName) return;
+    try {
+      const response = await axios.post('http://localhost:7777/api/groups/', {
+        name: groupName
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
+        }
+      });
+      setGroups([...groups, response.data]);
+    } catch (error) {
+      console.error('Create group error:', error);
+      alert('Error creating group');
     }
   };
 
   return (
-    <Container>
-      <Box display="flex" flexDirection="column" alignItems="center" mt={5}>
-        <Typography variant="h5" component="h2" gutterBottom>
-          Groups
-        </Typography>
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+      sx={{
+        backgroundColor: '#0A1828',
+        width: '100%',
+        height: '100vh',
+        padding: '2rem',
+      }}
+    >
+      <Typography
+        variant="h4"
+        component="h4"
+        gutterBottom
+        sx={{ color: '#BFA181', textAlign: 'center', fontWeight: 'bold' }}
+      >
+        Groups
+      </Typography>
+      <Button 
+        onClick={handleCreateGroup} 
+        sx={{ 
+          marginBottom: '16px', 
+          backgroundColor: '#BFA181', 
+          color: '#0A1828' 
+        }}
+      >
+        Create Group
+      </Button>
+      <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
         {groups.map((group) => (
-          <Box key={group.id} display="flex" flexDirection="row" alignItems="center" mt={1}>
-            <Typography variant="body1">{group.name}</Typography>
-            <Button variant="contained" color="primary" onClick={() => handleJoinGroup(group.id)}>
-              Join
-            </Button>
-          </Box>
+          <ListItem key={group.id} button onClick={() => handleJoinGroup(group.id)}>
+            <ListItemText primary={group.name} />
+          </ListItem>
         ))}
-        {error && (
-          <Typography color="error" style={{ marginTop: '16px' }}>
-            {error}
-          </Typography>
-        )}
-      </Box>
-    </Container>
+      </List>
+    </Box>
   );
 };
 
