@@ -1,112 +1,265 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Container, Typography, TextField, Button, Box, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
-import { useNavigate } from 'react-router';
+import { useParams, useNavigate } from 'react-router';
+import { Button, TextField, Typography, Box, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 
-const AddGroup = () => {
-  const [name, setName] = useState('');
-  const [users, setUsers] = useState([]);
-  const [selectedMembers, setSelectedMembers] = useState([]);
+const AddExpense = () => {
+  const { groupId } = useParams();
+  const [description, setDescription] = useState('');
+  const [amount, setAmount] = useState('');
+  const [splitType, setSplitType] = useState('equal');
+  const [contributions, setContributions] = useState([]);
+  const [groupMembers, setGroupMembers] = useState([]);
   const navigate = useNavigate();
 
+  // Fetch group data (including members) when the component mounts
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchGroupData = async () => {
       try {
-        const token = localStorage.getItem('jwt_token');
-        const response = await axios.get('http://localhost:7777/api/users/', {
+        const response = await axios.get(`http://localhost:7777/api/groups/${groupId}/members/`, {
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
           }
         });
-        setUsers(response.data);
+        // Extract members from the group data
+        setGroupMembers(response.data.members);
       } catch (error) {
-        console.error('Failed to fetch users:', error);
+        console.error('Error fetching group data:', error);
       }
     };
 
-    fetchUsers();
-  }, []);
+    fetchGroupData();
+  }, [groupId]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const token = localStorage.getItem('jwt_token');
-
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     try {
-      // Step 1: Create the group
-      const createGroupResponse = await axios.post('http://localhost:7777/api/groups/', { name }, {
+      const response = await axios.post(`http://localhost:7777/api/groups/${groupId}/expenses/`, {
+        description,
+        amount,
+        split_type: splitType,
+        contributions: contributions.map((contribution) => ({
+          username: contribution.username,
+          amount: contribution.amount
+        }))
+      }, {
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
         }
       });
-
-      const groupId = createGroupResponse.data.id;
-
-      // Step 2: Add members to the group
-      await Promise.all(selectedMembers.map(memberId => {
-        const username = users.find(user => user.id === memberId).username;
-        return axios.post(`http://localhost:7777/api/groups/${groupId}/join/`, { username }, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-      }));
-
-      alert('Group created successfully!');
-      setName('');
-      setSelectedMembers([]);
-      navigate('/'); // Redirect to home page after group is created
+      alert('Expense added successfully');
+      navigate(`/groups/${groupId}`);
     } catch (error) {
-      console.error('Error creating group:', error);
-      alert('Error creating group');
+      console.error('Add expense error:', error);
+      alert('Error adding expense');
     }
   };
 
-  const handleMembersChange = (event) => {
-    setSelectedMembers(event.target.value);
+  const handleAddContribution = () => {
+    setContributions([...contributions, { username: '', amount: '' }]);
+  };
+
+  const handleContributionChange = (index, field, value) => {
+    const newContributions = [...contributions];
+    newContributions[index][field] = value;
+    setContributions(newContributions);
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box display="flex" flexDirection="column" alignItems="center" mt={5}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Add Group
-        </Typography>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            label="Group Name"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <FormControl fullWidth margin="normal">
-            <InputLabel id="members-label">Members</InputLabel>
-            <Select
-              labelId="members-label"
-              multiple
-              value={selectedMembers}
-              onChange={handleMembersChange}
-              renderValue={(selected) => selected.map((memberId) => {
-                const user = users.find(user => user.id === memberId);
-                return user ? user.username : memberId;
-              }).join(', ')}
-            >
-              {users.map((user) => (
-                <MenuItem key={user.id} value={user.id}>
-                  {user.username}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
-            Add Group
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+      sx={{
+        backgroundColor: '#0A1828',
+        width: '100%',
+        height: '100vh',
+        padding: '2rem',
+      }}
+    >
+      <Typography
+        variant="h4"
+        component="h4"
+        gutterBottom
+        sx={{ color: '#BFA181', textAlign: 'center', fontWeight: 'bold' }}
+      >
+        Add Expense
+      </Typography>
+      <form onSubmit={handleSubmit} style={{ width: '300px' }}>
+        <TextField
+          label="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          margin="normal"
+          fullWidth
+          required
+          sx={{
+            '& .MuiInputBase-input': {
+              color: '#BFA181', // Text color
+            },
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: '#BFA181', // Border color
+              },
+              '&:hover fieldset': {
+                borderColor: '#BFA181', // Border color on hover
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: '#BFA181', // Border color when focused
+              },
+            },
+            '& .MuiInputLabel-root': {
+              color: '#BFA181', // Label color
+            },
+          }}
+        />
+        <TextField
+          label="Amount"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          margin="normal"
+          fullWidth
+          required
+          sx={{
+            '& .MuiInputBase-input': {
+              color: '#BFA181', // Text color
+            },
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: '#BFA181', // Border color
+              },
+              '&:hover fieldset': {
+                borderColor: '#BFA181', // Border color on hover
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: '#BFA181', // Border color when focused
+              },
+            },
+            '& .MuiInputLabel-root': {
+              color: '#BFA181', // Label color
+            },
+          }}
+        />
+        <FormControl fullWidth margin="normal">
+          <InputLabel sx={{ color: '#BFA181' }}>Split Type</InputLabel>
+          <Select
+            value={splitType}
+            onChange={(e) => setSplitType(e.target.value)}
+            sx={{
+              '& .MuiInputBase-input': {
+                color: '#BFA181', // Text color
+              },
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: '#BFA181', // Border color
+                },
+                '&:hover fieldset': {
+                  borderColor: '#BFA181', // Border color on hover
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#BFA181', // Border color when focused
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: '#BFA181', // Label color
+              },
+            }}
+          >
+            <MenuItem value="equal">Equal</MenuItem>
+            <MenuItem value="custom">Custom</MenuItem>
+          </Select>
+        </FormControl>
+        {splitType === 'custom' && contributions.map((contribution, index) => (
+          <Box key={index} sx={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+            <FormControl fullWidth margin="normal">
+              <InputLabel sx={{ color: '#BFA181' }}>Username</InputLabel>
+              <Select
+                value={contribution.username}
+                onChange={(e) => handleContributionChange(index, 'username', e.target.value)}
+                sx={{
+                  '& .MuiInputBase-input': {
+                    color: '#BFA181',
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: '#BFA181',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#BFA181',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#BFA181',
+                    },
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#BFA181',
+                  },
+                }}
+              >
+                {groupMembers.map((member) => (
+                  <MenuItem key={member.id} value={member.username}>
+                    {member.username}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <TextField
+              label="Amount"
+              value={contribution.amount}
+              onChange={(e) => handleContributionChange(index, 'amount', e.target.value)}
+              margin="normal"
+              fullWidth
+              required
+              sx={{
+                '& .MuiInputBase-input': {
+                  color: '#BFA181',
+                },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: '#BFA181',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#BFA181',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#BFA181',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#BFA181',
+                },
+              }}
+            />
+          </Box>
+        ))}
+        {splitType === 'custom' && (
+          <Button 
+            onClick={handleAddContribution} 
+            sx={{ 
+              marginTop: '16px', 
+              backgroundColor: '#BFA181', 
+              color: '#0A1828' 
+            }}
+          >
+            Add Contribution
           </Button>
-        </form>
-      </Box>
-    </Container>
+        )}
+        <Button
+          type="submit"
+          variant="contained"
+          fullWidth
+          sx={{ 
+            marginTop: '16px', 
+            backgroundColor: '#BFA181', 
+            color: '#0A1828' 
+          }}
+        >
+          Add Expense
+        </Button>
+      </form>
+    </Box>
   );
-}
+};
 
-export default AddGroup;
+export default AddExpense;
