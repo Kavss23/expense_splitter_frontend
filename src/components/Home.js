@@ -1,13 +1,13 @@
-// Home.js
+
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router';
-import { Button, Typography, Container, Box } from '@mui/material';
+import { useNavigate, Link } from 'react-router';
+import { Button, Typography, Container, Box, Divider } from '@mui/material';
 import axios from 'axios';
 
 const Home = () => {
   const navigate = useNavigate();
   const [groups, setGroups] = useState([]);
-  const [selectedGroupId, setSelectedGroupId] = useState(null);
+  const [selectedGroup, setSelectedGroup] = useState(null);
   const [expenses, setExpenses] = useState([]);
   const [balances, setBalances] = useState([]);
 
@@ -35,7 +35,7 @@ const Home = () => {
   }, [navigate]);
 
   const fetchExpenses = useCallback(async () => {
-    if (!selectedGroupId) return;
+    if (!selectedGroup) return;
 
     try {
       const token = localStorage.getItem('jwt_token');
@@ -44,7 +44,7 @@ const Home = () => {
         return;
       }
 
-      const response = await axios.get(`http://localhost:7777/api/groups/${selectedGroupId}/expenses/`, {
+      const response = await axios.get(`http://localhost:7777/api/groups/${selectedGroup.id}/expenses/`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -57,10 +57,10 @@ const Home = () => {
         navigate('/logout');
       }
     }
-  }, [navigate, selectedGroupId]);
+  }, [navigate, selectedGroup]);
 
   const fetchBalances = useCallback(async () => {
-    if (!selectedGroupId) return;
+    if (!selectedGroup) return;
 
     try {
       const token = localStorage.getItem('jwt_token');
@@ -69,7 +69,7 @@ const Home = () => {
         return;
       }
 
-      const response = await axios.get(`http://localhost:7777/api/groups/${selectedGroupId}/summary/`, {
+      const response = await axios.get(`http://localhost:7777/api/groups/${selectedGroup.id}/summary/`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -82,16 +82,18 @@ const Home = () => {
         navigate('/logout');
       }
     }
-  }, [navigate, selectedGroupId]);
+  }, [navigate, selectedGroup]);
 
   useEffect(() => {
     fetchGroups();
   }, [fetchGroups]);
 
   useEffect(() => {
-    fetchExpenses();
-    fetchBalances();
-  }, [fetchExpenses, fetchBalances]);
+    if (selectedGroup) {
+      fetchExpenses();
+      fetchBalances();
+    }
+  }, [fetchExpenses, fetchBalances, selectedGroup]);
 
   return (
     <Container maxWidth="sm">
@@ -103,24 +105,45 @@ const Home = () => {
           Welcome aboard! This application is meant to track expenses in real time. Hope you have a good experience with it.
         </Typography>
         <Box sx={{ width: '100%', marginBottom: '16px' }}>
+          <Button
+            variant="contained"
+            fullWidth
+            sx={{ 
+              marginBottom: '16px', 
+              backgroundColor: '#BFA181', 
+              color: '#0A1828' 
+            }}
+            component={Link}
+            to="/add-group"
+          >
+            Add Group
+          </Button>
           <Typography variant="h6" sx={{ color: '#178582' }}>Groups</Typography>
           {groups.map((group) => (
             <Button
               key={group.id}
               fullWidth
               sx={{ 
-                backgroundColor: selectedGroupId === group.id ? '#178582' : '#BFA181', 
+                backgroundColor: selectedGroup && selectedGroup.id === group.id ? '#178582' : '#BFA181', 
                 color: '#0A1828', 
                 marginBottom: '8px' 
               }}
-              onClick={() => setSelectedGroupId(group.id)}
+              onClick={() => setSelectedGroup(group)}
             >
               {group.name}
             </Button>
           ))}
         </Box>
-        {selectedGroupId && (
+        {selectedGroup && (
           <>
+            <Box sx={{ width: '100%', marginBottom: '16px' }}>
+              <Typography variant="h6" sx={{ color: '#178582' }}>Group Members</Typography>
+              {selectedGroup.members.map((member, index) => (
+                <Box key={index} sx={{ color: '#BFA181', marginBottom: '8px' }}>
+                  {member}
+                </Box>
+              ))}
+            </Box>
             <Box sx={{ width: '100%', marginBottom: '16px' }}>
               <Typography variant="h6" sx={{ color: '#178582' }}>Expenses</Typography>
               {expenses.map((expense) => (
@@ -131,11 +154,23 @@ const Home = () => {
             </Box>
             <Box sx={{ width: '100%', marginBottom: '16px' }}>
               <Typography variant="h6" sx={{ color: '#178582' }}>Balances</Typography>
-              {balances.map((balance, index) => (
-                <Box key={index} sx={{ color: '#BFA181', marginBottom: '8px' }}>
-                  {balance.user} owes {balance.amount}
-                </Box>
-              ))}
+              <Box>
+                <Typography variant="subtitle1" sx={{ color: '#178582' }}>Who Owes Money:</Typography>
+                {balances.filter(balance => balance.owed_by).map((balance, index) => (
+                  <Box key={index} sx={{ color: '#BFA181', marginBottom: '8px' }}>
+                    {balance.owed_by} owes {balance.amount} 
+                  </Box>
+                ))}
+              </Box>
+              <Divider sx={{ my: 2 }} />
+              <Box>
+                <Typography variant="subtitle1" sx={{ color: '#178582' }}>Who Is Owed Money:</Typography>
+                {balances.filter(balance => balance.owed_to).map((balance, index) => (
+                  <Box key={index} sx={{ color: '#BFA181', marginBottom: '8px' }}>
+                    {balance.owed_to} is owed {balance.amount} 
+                  </Box>
+                ))}
+              </Box>
             </Box>
             <Button
               variant="contained"
@@ -145,7 +180,7 @@ const Home = () => {
                 backgroundColor: '#BFA181', 
                 color: '#0A1828' 
               }}
-              onClick={() => navigate(`/groups/${selectedGroupId}/add-expense`)}
+              onClick={() => navigate(`/groups/${selectedGroup.id}/add-expense`)}
             >
               Add Expense
             </Button>

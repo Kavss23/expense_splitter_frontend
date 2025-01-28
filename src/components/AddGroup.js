@@ -27,38 +27,21 @@ const AddGroup = () => {
     fetchUsers();
   }, []);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     const token = localStorage.getItem('jwt_token');
-
-    try {
-      // Step 1: Create the group
-      const createGroupResponse = await axios.post('http://localhost:7777/api/groups/', { name }, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      const groupId = createGroupResponse.data.id;
-
-      // Step 2: Add members to the group
-      await Promise.all(selectedMembers.map(memberId => {
-        const username = users.find(user => user.id === memberId).username;
-        return axios.post(`http://localhost:7777/api/groups/${groupId}/join/`, { username }, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-      }));
-
-      alert('Group created successfully!');
-      setName('');
-      setSelectedMembers([]);
-      navigate('/'); // Redirect to home page after group is created
-    } catch (error) {
-      console.error('Error creating group:', error);
-      alert('Error creating group');
-    }
+    axios.post('http://localhost:7777/api/groups/', { name, members: selectedMembers }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then(response => {
+        alert('Group created successfully!');
+        setName('');
+        setSelectedMembers([]);
+        navigate('/'); // Redirect to home page after group is created
+      })
+      .catch(error => console.error('Error creating group:', error));
   };
 
   const handleMembersChange = (event) => {
