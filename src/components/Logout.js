@@ -13,7 +13,8 @@ const Logout = ({ onLogout }) => {
   useEffect(() => {
     // Perform the logout action using redux
     dispatch(logout());    
-    localStorage.removeItem('jwt_token');  // Clear the JWT token from local storage
+    localStorage.removeItem('jwt_token'); 
+    localStorage.removeItem('username'); // Clear the JWT token from local storage
     onLogout();
 
     // Redirect to the login page

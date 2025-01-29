@@ -21,6 +21,7 @@ const Login = ({ onLoginSuccess }) => {
         username,
         password,
       });
+      localStorage.setItem('username', username);
       localStorage.setItem('jwt_token', response.data.access);
       dispatch(loginSuccess(response.data));
       alert('Successfully logged in');

@@ -7,7 +7,7 @@ import AddExpense from './components/AddExpense';
 
 
 
-import Logout1 from './components/Logout';
+import Logout from './components/Logout';
 import AddGroup from './components/AddGroup';
 
 const App = () => {
@@ -35,7 +35,7 @@ const App = () => {
         <Route path="/login" element={isLoggedIn ? <Navigate to="/home" /> : <Login onLoginSuccess={handleLoginSuccess} />} />
         <Route path="/signup" element={isLoggedIn ? <Navigate to="/home" /> : <Signup onSignupSuccess={handleSignupSuccess} />} />
         <Route path="/home" element={isLoggedIn ? <Home /> : <Navigate to="/login" />} />
-        <Route path="/logout" element={<Logout1 onLogout={handleLogout} />} />
+        <Route path="/logout" element={<Logout onLogout={handleLogout} />} />
         <Route path="/add-group" element={<AddGroup />} />
         
        
