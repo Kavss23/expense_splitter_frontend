@@ -1,7 +1,6 @@
-// Signup.js
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Button, TextField, Typography, Box } from '@mui/material';
+import { Button, TextField, Typography, Box, Snackbar, Alert } from '@mui/material';
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { AccountCircle, Email, Lock } from '@mui/icons-material';
@@ -14,6 +13,9 @@ const Signup = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const errorMessage = useSelector((state) => state.auth.error);
+  const [open, setOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [severity, setSeverity] = useState('success'); // 'success', 'error', 'warning', 'info'
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -23,7 +25,9 @@ const Signup = () => {
         email,
         password,
       });
-      alert('Account created successfully! Please login');
+      setSnackbarMessage('Account created successfully! Please login');
+      setSeverity('success');
+      setOpen(true);
       dispatch(signupSuccess(response.data));
       navigate('/login');
     } catch (error) {
@@ -32,17 +36,31 @@ const Signup = () => {
         const errorData = error.response.data;
         if (errorData.username) {
           dispatch(signupFailure(`Username: ${errorData.username}`));
+          setSnackbarMessage(`Username: ${errorData.username}`);
         } else if (errorData.email) {
           dispatch(signupFailure(`Email: ${errorData.email}`));
+          setSnackbarMessage(`Email: ${errorData.email}`);
         } else if (errorData.non_field_errors) {
           dispatch(signupFailure(`Error: ${errorData.non_field_errors}`));
+          setSnackbarMessage(`Error: ${errorData.non_field_errors}`);
         } else {
           dispatch(signupFailure('Error during registration'));
+          setSnackbarMessage('Error during registration');
         }
       } else {
         dispatch(signupFailure('Error during registration'));
+        setSnackbarMessage('Error during registration');
       }
+      setSeverity('error');
+      setOpen(true);
     }
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpen(false);
   };
 
   return (
@@ -62,7 +80,7 @@ const Signup = () => {
         variant="h4"
         component="h4"
         gutterBottom
-        sx={{ color: '#BFA181', textAlign: 'center', fontWeight: 'bold' , marginTop:'70px'}}
+        sx={{ color: '#BFA181', textAlign: 'center', fontWeight: 'bold', marginTop: '70px' }}
       >
         SplitSure
       </Typography>
@@ -82,11 +100,6 @@ const Signup = () => {
       >
         SIGN UP
       </Typography>
-      {errorMessage && (
-        <Typography color="error" align="center">
-          {errorMessage}
-        </Typography>
-      )}
       <form onSubmit={handleSubmit} style={{ width: '300px' }}>
         <TextField
           label="Username"
@@ -103,7 +116,7 @@ const Signup = () => {
               fontSize: '0.875rem',
               border: '1px solid #BFA181',
               borderRadius: '8px',
-              marginTop:'10px', // Increased padding to ensure space for placeholder
+              marginTop: '10px', // Increased padding to ensure space for placeholder
               color: '#178582'  // Set the input text color to golden
             }
           }}
@@ -127,7 +140,7 @@ const Signup = () => {
               fontSize: '0.875rem',
               border: '1px solid #BFA181',
               borderRadius: '8px',
-              marginTop:'10px',  // Increased padding to ensure space for placeholder
+              marginTop: '10px',  // Increased padding to ensure space for placeholder
               color: '#178582'  // Set the input text color to golden
             }
           }}
@@ -151,7 +164,7 @@ const Signup = () => {
               fontSize: '0.875rem',
               border: '1px solid #BFA181',
               borderRadius: '8px',
-              marginTop:'10px',  // Increased padding to ensure space for placeholder
+              marginTop: '10px',  // Increased padding to ensure space for placeholder
               color: '#178582'  // Set the input text color to golden
             }
           }}
@@ -163,22 +176,27 @@ const Signup = () => {
           type="submit"
           variant="contained"
           fullWidth
-          sx={{ 
-            marginTop: '16px', 
-            backgroundColor: '#BFA181', 
-            color: '#0A1828', 
-            width: '300px' 
+          sx={{
+            marginTop: '16px',
+            backgroundColor: '#BFA181',
+            color: '#0A1828',
+            width: '300px'
           }}
         >
           Sign Up
         </Button>
       </form>
       <Typography variant="body2" sx={{ marginTop: '16px', color: '#178582' }}>
-        Already have an account? 
+        Already have an account?
         <Button color="inherit" sx={{ color: '#178582' }} onClick={() => navigate('/login')}>
           Login
         </Button>
       </Typography>
+      <Snackbar open={open} autoHideDuration={6000} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity={severity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

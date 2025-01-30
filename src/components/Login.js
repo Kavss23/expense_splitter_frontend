@@ -1,8 +1,7 @@
-// App.js
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { Button, TextField, Typography, Box } from '@mui/material';
+import { Button, TextField, Typography, Box, Snackbar, Alert } from '@mui/material';
 import { AccountCircle, Lock } from '@mui/icons-material';
 import axios from 'axios';
 import { loginSuccess, loginFailure } from '../redux/authSlice';
@@ -12,7 +11,9 @@ const Login = ({ onLoginSuccess }) => {
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const errorMessage = useSelector((state) => state.auth.error);
+  const [open, setOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [severity, setSeverity] = useState('success'); // 'success', 'error', 'warning', 'info'
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -24,15 +25,29 @@ const Login = ({ onLoginSuccess }) => {
       localStorage.setItem('username', username);
       localStorage.setItem('jwt_token', response.data.access);
       dispatch(loginSuccess(response.data));
-      alert('Successfully logged in');
+      setSnackbarMessage('Successfully logged in');
+      setSeverity('success');
+      setOpen(true);
       onLoginSuccess();
     } catch (error) {
       dispatch(loginFailure('Invalid credentials'));
+      setSnackbarMessage('Invalid credentials');
+      setSeverity('error');
+      setOpen(true);
+      setUsername(''); // Clear the username field
+      setPassword(''); // Clear the password field
     }
   };
 
   const handleSignupRedirect = () => {
     navigate('/signup');
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpen(false);
   };
 
   return (
@@ -64,11 +79,6 @@ const Login = ({ onLoginSuccess }) => {
       >
         LOGIN
       </Typography>
-      {errorMessage && (
-        <Typography color="error">
-          {errorMessage}
-        </Typography>
-      )}
       <form onSubmit={handleSubmit} style={{ width: '300px' }}>
         <TextField
           label="Username"
@@ -85,12 +95,12 @@ const Login = ({ onLoginSuccess }) => {
               fontSize: '0.875rem',
               border: '1px solid #BFA181',
               borderRadius: '8px',
-              marginTop:'10px',
+              marginTop: '10px',
               color: '#178582'  // Set the input text color to golden
             }
           }}
           InputLabelProps={{
-            style: { fontSize: '0.875rem', color: '#BFA181',  }
+            style: { fontSize: '0.875rem', color: '#BFA181', }
           }}
         />
         <TextField
@@ -109,8 +119,7 @@ const Login = ({ onLoginSuccess }) => {
               fontSize: '0.875rem',
               border: '1px solid #BFA181',
               borderRadius: '8px',
-              marginTop:'10px',
-            
+              marginTop: '10px',
               color: '#178582'  // Set the input text color to golden
             }
           }}
@@ -122,11 +131,11 @@ const Login = ({ onLoginSuccess }) => {
           type="submit"
           variant="contained"
           fullWidth
-          sx={{ 
-            marginTop: '16px', 
-            backgroundColor: '#BFA181', 
-            color: '#0A1828', 
-            width: '300px' 
+          sx={{
+            marginTop: '16px',
+            backgroundColor: '#BFA181',
+            color: '#0A1828',
+            width: '300px'
           }}
         >
           Login
@@ -138,6 +147,11 @@ const Login = ({ onLoginSuccess }) => {
           Sign Up
         </Button>
       </Typography>
+      <Snackbar open={open} autoHideDuration={6000} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity={severity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
