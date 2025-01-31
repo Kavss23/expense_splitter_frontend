@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Button, TextField, Typography, Box, Snackbar, Alert } from '@mui/material';
+import { Button, TextField, Typography, Box, Snackbar, Alert, useMediaQuery } from '@mui/material';
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { AccountCircle, Email, Lock } from '@mui/icons-material';
@@ -8,6 +8,7 @@ import { signupSuccess, signupFailure } from '../redux/authSlice';
 
 const Signup = () => {
   const [username, setUsername] = useState('');
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
@@ -15,7 +16,9 @@ const Signup = () => {
   const errorMessage = useSelector((state) => state.auth.error);
   const [open, setOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [severity, setSeverity] = useState('success'); // 'success', 'error', 'warning', 'info'
+  const [severity, setSeverity] = useState('success');
+
+  const isSmallScreen = useMediaQuery('(max-width: 600px)'); // 'success', 'error', 'warning', 'info'
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -73,11 +76,11 @@ const Signup = () => {
         backgroundColor: '#0A1828',
         width: '100%',
         height: '90vh',
-        padding: '2rem',
+        padding: isSmallScreen ? '1rem' : '2rem',
       }}
     >
       <Typography
-        variant="h4"
+        variant={isSmallScreen ? 'h5' : 'h4'}
         component="h4"
         gutterBottom
         sx={{ color: '#BFA181', textAlign: 'center', fontWeight: 'bold', marginTop: '70px' }}
@@ -100,7 +103,7 @@ const Signup = () => {
       >
         SIGN UP
       </Typography>
-      <form onSubmit={handleSubmit} style={{ width: '300px' }}>
+      <form onSubmit={handleSubmit} style={{ width: isSmallScreen ? '250px' : '300px' }}>
         <TextField
           label="Username"
           value={username}
@@ -180,7 +183,7 @@ const Signup = () => {
             marginTop: '16px',
             backgroundColor: '#BFA181',
             color: '#0A1828',
-            width: '300px'
+            width: isSmallScreen ? '250px' : '300px'
           }}
         >
           Sign Up

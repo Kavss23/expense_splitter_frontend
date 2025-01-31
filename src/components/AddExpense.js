@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate, useLocation } from 'react-router';
-import { AppBar, Toolbar, Button, Typography, TextField, Box, MenuItem, Select, FormControl, InputLabel, InputAdornment, Paper, IconButton, Snackbar, Alert } from '@mui/material';
+import { AppBar, Toolbar, Button, Typography, TextField, Box, MenuItem, useMediaQuery,Select, FormControl, InputLabel, InputAdornment, Paper, IconButton, Snackbar, Alert } from '@mui/material';
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import HomeIcon from '@mui/icons-material/Home';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
@@ -26,7 +26,7 @@ const AddExpense = () => {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('info'); // Default severity
-
+    const isSmallScreen = useMediaQuery('(max-width: 600px)');
     useEffect(() => {
         const fetchGroupData = async () => {
             try {
@@ -83,6 +83,7 @@ const AddExpense = () => {
             showSnackbar("Amount is required.", 'error');
             return;
         }
+       
 
         if (splitType === 'custom' && contributions.length === 0) {
             showSnackbar("Contributions are required for custom split.", 'error');
@@ -109,6 +110,10 @@ const AddExpense = () => {
                       showSnackbar("Contribution amounts must be valid numbers.", 'error');
                       return;
                   }
+                  if (!contribution.username) {
+                    showSnackbar("Please select a username for each contribution.", 'error');
+                    return;
+                }
                   contributionsTotal += amount;
               }
 
@@ -190,25 +195,27 @@ const AddExpense = () => {
     return (
       <>
           <AppBar position="static" sx={{ backgroundColor: '#BFA181' }}>
-              <Toolbar>
-                  <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: '#0A1828' }}>
-                      Expense Splitter Dashboard
-                  </Typography>
-                    <AccountCircle sx={{ color: '#0A1828', fontSize: '25px' }} />
-                    <Typography variant="h6" sx={{ color: '#0A1828', marginRight:1}}>
-                      {username ? username[0].toUpperCase() : 'G'}
-                        </Typography>
-                                        
-                  <Button color="inherit" onClick={() => navigate('/')} sx={{ color: '#0A1828' }}>
-                      <HomeIcon sx ={{marginRight:1}}/>
-                      Home
-                  </Button>
-                  <Button color="inherit" onClick={() => navigate('/logout')} sx={{ color: '#0A1828' }}>
-                      <ExitToAppIcon sx={{ marginRight: 1 }} />
-                      Logout
-                  </Button>
-              </Toolbar>
-          </AppBar>
+        <Toolbar sx={{ flexDirection: isSmallScreen ? 'column' : 'row', alignItems: isSmallScreen ? 'stretch' : 'center' }}>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: '#0A1828', textAlign: isSmallScreen ? 'center' : 'left', marginBottom: isSmallScreen ? 1 : 0 }}>
+            Expense Splitter Dashboard
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: isSmallScreen ? 'center' : 'flex-end', width: isSmallScreen ? '100%' : 'auto' }}>
+            <AccountCircle sx={{ color: '#0A1828', fontSize: '25px', marginRight: isSmallScreen ? 0 : 1 }} />
+            <Typography variant="h6" sx={{ color: '#0A1828', marginRight: isSmallScreen ? 0 : 1 }}>
+              {username ? username[0].toUpperCase() : 'G'}
+            </Typography>
+            <Button color="inherit" onClick={() => navigate('/')} sx={{ color: '#0A1828', display: 'flex', alignItems: 'center', margin: isSmallScreen ? '0 auto' : 0 }}>
+              <HomeIcon sx={{ marginRight: 1 }} />
+              Home
+            </Button>
+            <Button color="inherit" onClick={() => navigate('/logout')} sx={{ color: '#0A1828', display: 'flex', alignItems: 'center', margin: isSmallScreen ? '0 auto' : 0 }}>
+              <ExitToAppIcon sx={{ marginRight: 1 }} />
+              Logout
+            </Button>
+          </Box>
+        </Toolbar>
+      </AppBar>
+              
           <Box
               display="flex"
               flexDirection="column"
@@ -223,18 +230,18 @@ const AddExpense = () => {
               <Paper
                   elevation={3}
                   sx={{
-                      padding: '2rem',
+                    padding: isSmallScreen ? '1rem' : '2rem',
                       backgroundColor: '#0A1828',
                       border: '2px solid #BFA181',
                       borderRadius: '12px',
-                      width: '350px',
+                      width: isSmallScreen ? '95%' : '350px', boxSizing: 'border-box',
                       maxHeight: '80vh',
                       overflowY: 'auto',
                       marginTop: '1rem'
                   }}
               >
                   <Typography
-                      variant="h4"
+                      variant={isSmallScreen ? 'h5' : 'h4'}
                       component="h4"
                       gutterBottom
                       sx={{ color: '#BFA181', textAlign: 'center', fontWeight: 'bold', marginBottom: '40px' }}
@@ -366,7 +373,7 @@ const AddExpense = () => {
                                   onChange={(e) => handleContributionChange(index, 'amount', e.target.value)}
                                   margin="normal"
                                   fullWidth
-                                  required
+                                  
                                   InputProps={{
                                       style: {
                                           fontSize: '0.875rem',

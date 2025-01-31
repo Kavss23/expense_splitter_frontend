@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { AppBar, Toolbar, Button, Typography, TextField, Box, MenuItem, Select, FormControl, Paper, IconButton, Snackbar, Alert } from '@mui/material';
+import { AppBar, Toolbar, Button, Typography, TextField, Box, MenuItem, Select, FormControl, Paper, useMediaQuery,IconButton, Snackbar, Alert } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -21,6 +21,8 @@ const AddGroup = () => {
     const name = useSelector(state => state.groups.name);
     const users = useSelector(state => state.groups.users);
     const selectedMembers = useSelector(state => state.groups.selectedMembers);
+    const isSmallScreen = useMediaQuery('(max-width: 600px)');
+    
 
     const [open, setOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -174,29 +176,30 @@ const AddGroup = () => {
     return (
         <>
             <AppBar position="static" sx={{ backgroundColor: '#BFA181' }}>
-                <Toolbar>
-                    <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: '#0A1828' }}>
-                        Expense Splitter Dashboard
-                    </Typography>
-                    <AccountCircle sx={{ color: '#0A1828', fontSize: '25px' }} />
-                    <Typography variant="h6" sx={{ color: '#0A1828', marginRight:1}}>
-                      {username ? username[0].toUpperCase() : 'G'}
-                        </Typography>
-                                        
-                  <Button color="inherit" onClick={() => navigate('/')} sx={{ color: '#0A1828' }}>
-                      <HomeIcon sx ={{marginRight:1}}/>
-                      Home
-                  </Button>
-                  <Button color="inherit" onClick={() => navigate('/logout')} sx={{ color: '#0A1828' }}>
-                      <ExitToAppIcon sx={{ marginRight: 1 }} />
-                      Logout
-                    </Button>
-                </Toolbar>
-            </AppBar>
+        <Toolbar sx={{ flexDirection: isSmallScreen ? 'column' : 'row', alignItems: isSmallScreen ? 'stretch' : 'center' }}>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: '#0A1828', textAlign: isSmallScreen ? 'center' : 'left', marginBottom: isSmallScreen ? 1 : 0 }}>
+            Expense Splitter Dashboard
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: isSmallScreen ? 'center' : 'flex-end', width: isSmallScreen ? '100%' : 'auto' }}>
+            <AccountCircle sx={{ color: '#0A1828', fontSize: '25px', marginRight: isSmallScreen ? 0 : 1 }} />
+            <Typography variant="h6" sx={{ color: '#0A1828', marginRight: isSmallScreen ? 0 : 1 }}>
+              {username ? username[0].toUpperCase() : 'G'}
+            </Typography>
+            <Button color="inherit" onClick={() => navigate('/')} sx={{ color: '#0A1828', display: 'flex', alignItems: 'center', margin: isSmallScreen ? '0 auto' : 0 }}>
+              <HomeIcon sx={{ marginRight: 1 }} />
+              Home
+            </Button>
+            <Button color="inherit" onClick={() => navigate('/logout')} sx={{ color: '#0A1828', display: 'flex', alignItems: 'center', margin: isSmallScreen ? '0 auto' : 0 }}>
+              <ExitToAppIcon sx={{ marginRight: 1 }} />
+              Logout
+            </Button>
+          </Box>
+        </Toolbar>
+      </AppBar>
             <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center"
                 sx={{ backgroundColor: '#0A1828', width: '100%', height: '90vh' }}>
-                <Paper elevation={3} sx={{ padding: '2rem', backgroundColor: '#0A1828', border: '2px solid #BFA181', borderRadius: '12px', width: '350px' }}>
-                    <Typography variant="h4" component="h6" gutterBottom sx={{ color: '#BFA181', textAlign: 'center', fontWeight: 'bold' }}>
+                <Paper elevation={3} sx={{ padding: isSmallScreen ? '1rem' : '2rem', backgroundColor: '#0A1828', border: '2px solid #BFA181', borderRadius: '12px', width: isSmallScreen ? '90%' : '350px', boxSizing: 'border-box', }}>
+                    <Typography variant={isSmallScreen ? 'h5' : 'h4'} component="h6" gutterBottom sx={{ color: '#BFA181', textAlign: 'center', fontWeight: 'bold' }}>
                         {group ? 'Edit Group' : 'Add Group'}
                     </Typography>
                     <form onSubmit={handleSubmit} style={{ width: '100%' }}>

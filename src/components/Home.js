@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import { useNavigate, Link } from 'react-router';
-import { AppBar, Toolbar, Button, Dialog, DialogTitle, DialogContent, DialogActions,Typography, Container, Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Divider, Avatar,Snackbar, Alert} from '@mui/material';
+import { AppBar, Toolbar, Button, Dialog, DialogTitle, DialogContent, DialogActions,Typography, useMediaQuery,Container, Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Divider, Avatar,Snackbar, Alert} from '@mui/material';
 import axios from 'axios';
 
 import GroupIcon from '@mui/icons-material/Group';
@@ -34,6 +34,7 @@ const Home = () => {
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
     const [deleteType, setDeleteType] = useState(null); 
+    const isSmallScreen = useMediaQuery('(max-width: 600px)');
 
     const showSnackbar = (message, severity = 'info') => {
         setSnackbarMessage(message);
@@ -243,34 +244,38 @@ const Home = () => {
 
   
     return (
-      <Box sx={{ backgroundColor: '#0A1828', minHeight: '100vh' }}>
-          <AppBar position="static" sx={{ backgroundColor: '#BFA181', height: '10vh' }}>
-              <Toolbar>
-                  <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: '#0A1828' }}>
-                      Expense Splitter Dashboard
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', marginRight: 2 }}>
-                      <AccountCircle sx={{ color: '#0A1828', fontSize: '35px' }} />
-                      <Typography variant="h6" sx={{ color: '#0A1828', marginLeft: 0.5 }}>
-                          {username ? username[0].toUpperCase() : 'G'}
-                      </Typography>
-                  </Box>
-                  <Button color="inherit" component={Link} to="/add-group" sx={{ color: '#0A1828' }}>
-                      <GroupIcon sx={{ marginRight: 1 }} />
-                      Add Group
-                  </Button>
-                  {selectedGroup && (
-                      <Button color="inherit" onClick={() => navigate(`/groups/${selectedGroup.id}/add-expense`)} sx={{ color: '#0A1828' }}>
-                          <AddCircleIcon sx={{ marginRight: 1 }} />
-                          Add Expense
-                      </Button>
-                  )}
-                  <Button color="inherit" onClick={() => navigate('/logout')} sx={{ color: '#0A1828' }}>
-                      <ExitToAppIcon sx={{ marginRight: 1 }} />
-                      Logout
-                  </Button>
-              </Toolbar>
-          </AppBar>
+        <Box sx={{ backgroundColor: '#0A1828', minHeight: '100vh' }}>
+        <AppBar position="static" sx={{ backgroundColor: '#BFA181', height: isSmallScreen ? 'auto' : '10vh' }}>
+          <Toolbar sx={{ flexDirection: isSmallScreen ? 'column' : 'row', alignItems: isSmallScreen ? 'stretch' : 'center' }}>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: '#0A1828', textAlign: isSmallScreen ? 'center' : 'left', marginBottom: isSmallScreen ? 1 : 0 }}>
+              Expense Splitter Dashboard
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: isSmallScreen ? 'center' : 'flex-end', width: isSmallScreen ? '100%' : 'auto', marginBottom: isSmallScreen ? 1 : 0 }}>
+              <AccountCircle sx={{ color: '#0A1828', fontSize: isSmallScreen ? '25px' : '35px', marginRight: isSmallScreen ? 0 : 1 }} />
+              <Typography variant="h6" sx={{ color: '#0A1828', marginRight: isSmallScreen ? 0 : 1 }}>
+                {username ? username[0].toUpperCase() : 'G'}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', flexDirection: isSmallScreen ? 'column' : 'row', alignItems: 'center', justifyContent: isSmallScreen ? 'center' : 'flex-end' }}>
+              <Button color="inherit" component={Link} to="/add-group" sx={{ color: '#0A1828', marginBottom: isSmallScreen ? 1 : 0 }}>
+                <GroupIcon sx={{ marginRight: 1 }} />
+                Add Group
+              </Button>
+              {selectedGroup && (
+                <Button color="inherit" onClick={() => navigate(`/groups/${selectedGroup.id}/add-expense`)} sx={{ color: '#0A1828', marginBottom: isSmallScreen ? 1 : 0 }}>
+                  <AddCircleIcon sx={{ marginRight: 1 }} />
+                  Add Expense
+                </Button>
+              )}
+              <Button color="inherit" onClick={() => navigate('/logout')} sx={{ color: '#0A1828', marginBottom: isSmallScreen ? 1 : 0 }}>
+                <ExitToAppIcon sx={{ marginRight: 1 }} />
+                Logout
+              </Button>
+            </Box>
+          </Toolbar>
+        </AppBar>
+      
+      
           <Container maxWidth="md" sx={{ backgroundColor: '#0A1828', padding: '16px' }}>
               <Box display="flex" flexDirection="column" alignItems="center" mt={5}>
                   <Typography variant="h5" component="h2" gutterBottom sx={{ color: '#178582', textAlign: 'center', fontWeight: 'bold' }}>

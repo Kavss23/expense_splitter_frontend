@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { Button, TextField, Typography, Box, Snackbar, Alert } from '@mui/material';
+import { Button, TextField, Typography, Box, Snackbar, Alert, useMediaQuery } from '@mui/material';
 import { AccountCircle, Lock } from '@mui/icons-material';
 import axios from 'axios';
 import { loginSuccess, loginFailure } from '../redux/authSlice';
@@ -13,7 +13,9 @@ const Login = ({ onLoginSuccess }) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [severity, setSeverity] = useState('success'); // 'success', 'error', 'warning', 'info'
+  const [severity, setSeverity] = useState('success');
+  const isSmallScreen = useMediaQuery('(max-width: 600px)');
+  
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -60,11 +62,11 @@ const Login = ({ onLoginSuccess }) => {
         backgroundColor: '#0A1828',
         width: '100%',
         height: '90vh',
-        padding: '2rem',
+        padding: isSmallScreen ? '1rem' : '2rem',
       }}
     >
       <Typography
-        variant="h4"
+        variant={isSmallScreen ? 'h5' : 'h4'}
         component="h4"
         gutterBottom
         sx={{ color: '#BFA181', textAlign: 'center', fontWeight: 'bold' }}
@@ -79,7 +81,7 @@ const Login = ({ onLoginSuccess }) => {
       >
         LOGIN
       </Typography>
-      <form onSubmit={handleSubmit} style={{ width: '300px' }}>
+      <form onSubmit={handleSubmit} style={{ width: isSmallScreen ? '250px' : '300px' }}>
         <TextField
           label="Username"
           value={username}
@@ -135,7 +137,7 @@ const Login = ({ onLoginSuccess }) => {
             marginTop: '16px',
             backgroundColor: '#BFA181',
             color: '#0A1828',
-            width: '300px'
+            width: isSmallScreen ? '250px' : '300px'
           }}
         >
           Login
