@@ -11,7 +11,7 @@ const groupSlice = createSlice({
     initialState,
     reducers: {
         setUsers: (state, action) => {
-            state.users = action.payload;
+            state.users = action.payload; //This reducer updates the users array in the state with the payload from the action. This would typically be used after fetching user data from an API.
         },
         setGroupName: (state, action) => {
             state.name = action.payload;
@@ -21,7 +21,7 @@ const groupSlice = createSlice({
         },
         clearGroupForm: (state) => {
           state.name = '';
-          state.selectedMembers = [];
+          state.selectedMembers = []; //clear form in reload or after submit
         },
     },
 });

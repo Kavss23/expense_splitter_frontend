@@ -9,12 +9,12 @@ const Logout = ({ onLogout }) => {
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [severity, setSeverity] = useState('success'); // 'success', 'error', 'warning', 'info'
+  const [severity, setSeverity] = useState('success'); // 'success', 'error', 'warning', 
 
   useEffect(() => {
     // Perform the logout action using redux
     try {
-      dispatch(logout());
+      dispatch(logout()); //update in redux store
       localStorage.removeItem('jwt_token'); 
       localStorage.removeItem('username'); // Clear the JWT token from local storage
       onLogout();
@@ -29,7 +29,7 @@ const Logout = ({ onLogout }) => {
       setSeverity('error');
       setOpen(true);
     }
-  }, [dispatch, navigate, onLogout]);
+  }, [dispatch, navigate, onLogout]); //hook will run when the component mounts and if any of these dependencies change.
 
   const handleSnackbarClose = (event, reason) => {
     if (reason === 'clickaway') {

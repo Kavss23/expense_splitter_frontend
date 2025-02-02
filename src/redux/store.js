@@ -6,7 +6,7 @@ import homeReducer from './homeSlice';
 
 const store = configureStore({  //redux store
   reducer: { 
-    auth: authReducer, 
+    auth: authReducer, //authReducer will manage the part of the state that you access with state.auth
     expenses: expenseReducer,
     groups: groupReducer,
     home: homeReducer,

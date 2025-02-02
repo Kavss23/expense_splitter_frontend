@@ -5,7 +5,7 @@ import { Button, TextField, Typography, Box, Snackbar, Alert, useMediaQuery } fr
 import { AccountCircle, Lock } from '@mui/icons-material';
 import axios from 'axios';
 import { loginSuccess, loginFailure } from '../redux/authSlice';
-
+ 
 const Login = ({ onLoginSuccess }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -17,7 +17,7 @@ const Login = ({ onLoginSuccess }) => {
   const isSmallScreen = useMediaQuery('(max-width: 600px)');
   
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event) => {   //token generation for jwt
     event.preventDefault();
     try {
       const response = await axios.post('http://localhost:7777/api/login/', {
@@ -77,7 +77,7 @@ const Login = ({ onLoginSuccess }) => {
         variant="h6"
         component="h6"
         gutterBottom
-        sx={{ color: '#178582', textDecoration: 'underline' }}
+        sx={{ color: '#178582' }}
       >
         LOGIN
       </Typography>
@@ -98,7 +98,7 @@ const Login = ({ onLoginSuccess }) => {
               border: '1px solid #BFA181',
               borderRadius: '8px',
               marginTop: '10px',
-              color: '#178582'  // Set the input text color to golden
+              color: '#178582'  // Set the input text color to blue
             }
           }}
           InputLabelProps={{
@@ -122,7 +122,7 @@ const Login = ({ onLoginSuccess }) => {
               border: '1px solid #BFA181',
               borderRadius: '8px',
               marginTop: '10px',
-              color: '#178582'  // Set the input text color to golden
+              color: '#178582'  // Set the input text color to blue
             }
           }}
           InputLabelProps={{

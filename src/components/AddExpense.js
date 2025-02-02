@@ -14,7 +14,7 @@ const AddExpense = () => {
     const { groupId } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
-    const expense = location.state ? location.state.expense : null;
+    const expense = location.state ? location.state.expense : null; //for edit/add expenses
     const dispatch = useDispatch();
     const groupMembers = useSelector((state) => state.expenses.groupMembers);
 
@@ -44,13 +44,13 @@ const AddExpense = () => {
 
         fetchGroupData();
 
-        if (expense) {
+        if (expense) { //edit
             dispatch(setExpenseDescription(expense.description));
             dispatch(setExpenseAmount(expense.amount));
             dispatch(setExpenseSplitType(expense.split_type));
             dispatch(setExpenseContributions(expense.contributions.map(c => ({ username: c.user, amount: c.amount }))));
         } else {
-            dispatch(setExpenseDescription(''));
+            dispatch(setExpenseDescription('')); //add expense
             dispatch(setExpenseAmount(''));
             dispatch(setExpenseSplitType('equal'));
             dispatch(setExpenseContributions([]));
@@ -117,7 +117,7 @@ const AddExpense = () => {
                   contributionsTotal += amount;
               }
 
-              if (Math.abs(contributionsTotal - expenseData.amount) > 0.001) {
+              if (Math.abs(contributionsTotal - expenseData.amount) > 0.001) { //not matching
                   showSnackbar("Total contributions must equal the total amount for custom split.", 'error');
                   return;
               }
@@ -158,8 +158,8 @@ const AddExpense = () => {
     };
 
     const handleRemoveContribution = (index) => {
-        const newContributions = contributions.filter((_, i) => i !== index);
-        dispatch(setExpenseContributions(newContributions));
+        const newContributions = contributions.filter((_, i) => i !== index); // This is the callback function provided to filter
+        dispatch(setExpenseContributions(newContributions)); // _:current element not needeed
     };
 
     const handleContributionChange = (index, field, value) => {

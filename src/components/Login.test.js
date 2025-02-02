@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router";
 import Login from "./Login";
 import { Provider } from "react-redux";
-import store from "../redux/Store";
+import store from "../redux/store";
 
 
 describe('Login Component', () => {

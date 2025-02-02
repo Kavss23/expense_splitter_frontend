@@ -10,12 +10,12 @@ const initialState = {
     contributions: [], // Add contributions to state
 };
 
-const expensesSlice = createSlice({
+const expensesSlice = createSlice({ // receive the current state and an action object.  They then update the state based on the action's payload
     name: 'expenses',
     initialState,
-    reducers: {
+    reducers: { //can mutate the state directly inside the reducer
         setExpenses: (state, action) => {
-            state.expenses = action.payload;
+            state.expenses = action.payload; //return new state object
         },
         setBalances: (state, action) => {
             state.balances = action.payload;
@@ -38,7 +38,7 @@ const expensesSlice = createSlice({
                 state.expenses[index] = action.payload;
             }
         },
-        setExpenseDescription: (state, action) => {
+        setExpenseDescription: (state, action) => { //update the corresponding properties in the state with the payload from the action.
             state.description = action.payload;
         },
         setExpenseAmount: (state, action) => {

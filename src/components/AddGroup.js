@@ -15,10 +15,10 @@ import { setUsers, setGroupName, setSelectedMembers, clearGroupForm } from '../r
 const AddGroup = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const group = location.state ? location.state.group : null;
+    const group = location.state ? location.state.group : null; // Get group data if editing, null otherwise
     const dispatch = useDispatch();
     const username = localStorage.getItem('username');
-    const name = useSelector(state => state.groups.name);
+    const name = useSelector(state => state.groups.name); //get group name,users,selected members from redux store and store 
     const users = useSelector(state => state.groups.users);
     const selectedMembers = useSelector(state => state.groups.selectedMembers);
     const isSmallScreen = useMediaQuery('(max-width: 600px)');
@@ -47,17 +47,17 @@ const AddGroup = () => {
     }, [dispatch]);
 
     useEffect(() => {
-        if (group && users.length > 0) {
-            dispatch(setGroupName(group.name));
-            const selectedIds = group.members
+        if (group && users.length > 0) { // If editing a group and users are loaded
+            dispatch(setGroupName(group.name)); // Set group name in Redux store
+            const selectedIds = group.members // Map member usernames to user IDs
                 .map(member => {
                     const user = users.find(user => user.username === member);
                     return user ? user.id : null;
                 })
-                .filter(id => id !== null);
+                .filter(id => id !== null); // Filter out null IDs (users not found)
             dispatch(setSelectedMembers(selectedIds));
         } else if (!group) {
-            dispatch(clearGroupForm());
+            dispatch(clearGroupForm()); // Clear the group form in Redux store when adding grp
         }
     }, [group, users, dispatch]);
 
@@ -80,15 +80,22 @@ const AddGroup = () => {
         }
     
         try {
-            if (group) {
-                await axios.patch(`http://localhost:7777/api/groups/${group.id}/edit/`, { name }, { headers: { Authorization: `Bearer ${token}` } });
+            if (group) { //if grp exists 
+                await axios.patch(`http://localhost:7777/api/groups/${group.id}/edit/`, { name }, 
+                { headers: 
+                    { Authorization: `Bearer ${token}` 
+                }
+             });
                 setSnackbarMessage('Group updated successfully!');
                 setSeverity('success');
             } else {
-                const createGroupResponse = await axios.post('http://localhost:7777/api/groups/', { name }, { headers: { Authorization: `Bearer ${token}` } });
-                const groupId = createGroupResponse.data.id;
-                const memberUsernames = selectedMembers.map(memberId => users.find(user => user.id === memberId).username);
-                await axios.post(`http://localhost:7777/api/groups/${groupId}/join/`, { usernames: memberUsernames }, { headers: { Authorization: `Bearer ${token}` } });
+                const createGroupResponse = await axios.post('http://localhost:7777/api/groups/', { name }, 
+                { headers: 
+                    { Authorization: `Bearer ${token}` } 
+                });
+                const groupId = createGroupResponse.data.id; //id of created group
+                const memberUsernames = selectedMembers.map(memberId => users.find(user => user.id === memberId).username); //members names of those in grp
+                await axios.post(`http://localhost:7777/api/groups/${groupId}/join/`, { usernames: memberUsernames }, { headers: { Authorization: `Bearer ${token}` } }); //add  members
                 setSnackbarMessage('Group created successfully!');
                 setSeverity('success');
             }
@@ -97,7 +104,7 @@ const AddGroup = () => {
             navigate('/');
         } catch (error) {
             console.error(`Error ${group ? 'updating' : 'creating'} group:`, error);
-            setSnackbarMessage(`Error ${group ? 'updating' : 'creating'} group`);
+            setSnackbarMessage(`Error ${group ? 'updating' : 'creating'} group. Name already exists`);
             setSeverity('error');
             setOpen(true);
         }
@@ -212,14 +219,14 @@ const AddGroup = () => {
                             <Typography variant="body1" sx={{ color: '#BFA181', marginTop: '10px' }}>
                                 Members
                             </Typography>
-                            <Select multiple value={selectedMembers} onChange={handleMembersChange}
+                            <Select multiple value={selectedMembers} onChange={handleMembersChange} //drop down for members registred in app
                                 renderValue={(selected) => selected.map((memberId) => users.find((user) => user.id === memberId)?.username || memberId).join(', ')}
                                 sx={{ color: '#178582', border: '1px solid #BFA181', borderRadius: '8px', marginTop: '20px', '& .MuiSvgIcon-root': { color: '#BFA181' } }}>
                                 {users.map((user) => (
                                     <MenuItem key={user.id} value={user.id}>{user.username}</MenuItem>
                                 ))}
                             </Select>
-                            {group && (
+                            {group && ( //if grp exists
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
                                     <IconButton onClick={handleAddMembers} sx={{ color: '#BFA181' }}>
                                         <AddIcon />

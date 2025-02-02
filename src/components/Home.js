@@ -8,6 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import { AccountCircle } from '@mui/icons-material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import SyncIcon from '@mui/icons-material/Sync'; // Fetching groups and expenses
@@ -15,7 +16,9 @@ import ReceiptIcon from '@mui/icons-material/Receipt'; // Expenses
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance'; // Balances
 import PeopleIcon from '@mui/icons-material/People'; // Group Members
 import { useDispatch, useSelector } from 'react-redux';
+
 import { setGroups, setSelectedGroup, setExpenses, setBalances, clearSelectedGroup } from '../redux/homeSlice';
+import OverallBalanceSummary from './TotalBalance';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -35,6 +38,7 @@ const Home = () => {
     const [itemToDelete, setItemToDelete] = useState(null);
     const [deleteType, setDeleteType] = useState(null); 
     const isSmallScreen = useMediaQuery('(max-width: 600px)');
+  
 
     const showSnackbar = (message, severity = 'info') => {
         setSnackbarMessage(message);
@@ -104,6 +108,8 @@ const Home = () => {
         }
     }, [navigate, selectedGroup, dispatch]);
 
+    
+
     const fetchBalances = useCallback(async () => {
         if (!selectedGroup) return;
 
@@ -122,7 +128,7 @@ const Home = () => {
         } catch (error) {
             console.error('Failed to fetch balances:', error);
             if (error.response) {
-                showSnackbar(`Error fetching balances: ${error.response.data.message || error.response.status}`, 'error');
+                showSnackbar(`No balance found: ${error.response.data.message || error.response.status}`, 'error');
                 if (error.response.status === 401) {
                     navigate('/logout');
                 }
@@ -175,6 +181,13 @@ const Home = () => {
         }
         setItemToDelete(null);
         setDeleteType(null);
+
+        // Show snackbar message and redirect after 2 seconds
+        setSnackbarOpen(true);
+        setTimeout(() => {
+            setSnackbarOpen(false);
+            navigate('/');
+        }, 2000);
     };
 
     const handleCloseConfirmDialog = () => {
@@ -239,6 +252,7 @@ const Home = () => {
             } else {
                 showSnackbar("Error deleting expense: Network error", 'error');
             }
+            
         }
     };
 
@@ -274,16 +288,11 @@ const Home = () => {
             </Box>
           </Toolbar>
         </AppBar>
-      
+      <OverallBalanceSummary/>
       
           <Container maxWidth="md" sx={{ backgroundColor: '#0A1828', padding: '16px' }}>
               <Box display="flex" flexDirection="column" alignItems="center" mt={5}>
-                  <Typography variant="h5" component="h2" gutterBottom sx={{ color: '#178582', textAlign: 'center', fontWeight: 'bold' }}>
-                      Welcome aboard! Splitting expenses has never been easier.
-                  </Typography>
-                  <Typography variant="h5" component="h2" gutterBottom sx={{ color: '#178582', textAlign: 'center', fontWeight: 'bold' }}>
-                      Let's Get Started!
-                  </Typography>
+                
                   <Box sx={{ width: '100%', marginBottom: '30px' }}>
                       <Typography variant="h6" sx={{ color: '#178582', fontWeight: 'bold', marginTop: '20px', textAlign: 'center' }}>Groups</Typography>
                       <TableContainer component={Paper} sx={{ backgroundColor: '#83afaf' }}>

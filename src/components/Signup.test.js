@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { BrowserRouter } from "react-router";
-import store from "../redux/Store";
+import store from "../redux/store";
 import Signup from "./Signup";
 
 describe('SignUp Component', () => {

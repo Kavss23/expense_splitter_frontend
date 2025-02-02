@@ -20,8 +20,8 @@ const Signup = () => {
 
   const isSmallScreen = useMediaQuery('(max-width: 600px)'); // 'success', 'error', 'warning', 'info'
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async (event) => {  //The async keyword indicates that this function will perform asynchronous operations, and it will typically use the await keyword to pause the execution until a promise is resolved.
+    event.preventDefault();  //doesn't refresh for form submit to  allow logic. event passed as object in function
     try {
       const response = await axios.post('http://localhost:7777/api/register/', {
         username,
@@ -31,7 +31,7 @@ const Signup = () => {
       setSnackbarMessage('Account created successfully! Please login');
       setSeverity('success');
       setOpen(true);
-      dispatch(signupSuccess(response.data));
+      dispatch(signupSuccess(response.data));  //store success in redux
       navigate('/login');
     } catch (error) {
       console.error('Registration error:', error.response);
@@ -99,7 +99,7 @@ const Signup = () => {
         variant="h6"
         component="h6"
         gutterBottom
-        sx={{ color: '#178582', textDecoration: 'underline' }}
+        sx={{ color: '#178582'}}
       >
         SIGN UP
       </Typography>
@@ -119,8 +119,8 @@ const Signup = () => {
               fontSize: '0.875rem',
               border: '1px solid #BFA181',
               borderRadius: '8px',
-              marginTop: '10px', // Increased padding to ensure space for placeholder
-              color: '#178582'  // Set the input text color to golden
+              marginTop: '10px', 
+              color: '#178582'  
             }
           }}
           InputLabelProps={{
@@ -143,8 +143,8 @@ const Signup = () => {
               fontSize: '0.875rem',
               border: '1px solid #BFA181',
               borderRadius: '8px',
-              marginTop: '10px',  // Increased padding to ensure space for placeholder
-              color: '#178582'  // Set the input text color to golden
+              marginTop: '10px',  
+              color: '#178582'  
             }
           }}
           InputLabelProps={{
@@ -167,8 +167,8 @@ const Signup = () => {
               fontSize: '0.875rem',
               border: '1px solid #BFA181',
               borderRadius: '8px',
-              marginTop: '10px',  // Increased padding to ensure space for placeholder
-              color: '#178582'  // Set the input text color to golden
+              marginTop: '10px', 
+              color: '#178582'  
             }
           }}
           InputLabelProps={{

@@ -10,7 +10,7 @@ describe('App Component ', () => {
           <App />
       </Provider>
     );
-   expect(screen.getByText(/Expense Splitter/i)).toBeInTheDocument();
+   expect(screen.getByText(/Welcome to SplitSure/i)).toBeInTheDocument();
   });
 });
 
