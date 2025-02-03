@@ -13,7 +13,7 @@ const Signup = () => {
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const errorMessage = useSelector((state) => state.auth.error);
+  
   const [open, setOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [severity, setSeverity] = useState('success');
@@ -59,7 +59,7 @@ const Signup = () => {
     }
   };
 
-  const handleSnackbarClose = (event, reason) => {
+  const handleSnackbarClose = ( reason) => {
     if (reason === 'clickaway') {
       return;
     }

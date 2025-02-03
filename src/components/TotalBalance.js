@@ -21,12 +21,7 @@ const OverallBalanceSummary = () => {
     return (
         <Container maxWidth="md" sx={{ backgroundColor: '#0A1828', padding: '16px' }}>
             <Box display="flex" flexDirection="column" alignItems="center" mt={5}>
-                <Typography variant="h5" component="h2" gutterBottom sx={{ color: '#178582', textAlign: 'center', fontWeight: 'bold' }}>
-                    Welcome aboard! Splitting expenses has never been easier.
-                </Typography>
-                <Typography variant="h5" component="h2" gutterBottom sx={{ color: '#178582', textAlign: 'center', fontWeight: 'bold' }}>
-                    Let's Get Started!
-                </Typography>
+                
                 {data && ( //total woed to and owed by using backend api key
                     <Box mt={3} sx={{ textAlign: 'center' }}>
                         <Typography variant="h6" sx={{ color: '#fff' }}>

@@ -121,7 +121,7 @@ const AddGroup = () => {
             return;
         }
     
-        try {
+        try { //transform member id to usernames
             const memberUsernames = selectedMembers.map(memberId => users.find(user => user.id === memberId).username);
             await axios.patch(`http://localhost:7777/api/groups/${group.id}/update/`, { action: 'add', usernames: memberUsernames }, { headers: { Authorization: `Bearer ${token}` } });
             setSnackbarMessage('Members added successfully!');
@@ -173,7 +173,7 @@ const AddGroup = () => {
         dispatch(setGroupName(event.target.value));
     };
 
-    const handleSnackbarClose = (event, reason) => {
+    const handleSnackbarClose = ( reason) => {
         if (reason === 'clickaway') {
             return;
         }

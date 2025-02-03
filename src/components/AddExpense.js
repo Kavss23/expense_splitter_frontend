@@ -64,7 +64,7 @@ const AddExpense = () => {
         setSnackbarOpen(true);
     };
 
-    const handleCloseSnackbar = (event, reason) => {
+    const handleCloseSnackbar = ( reason) => {
         if (reason === 'clickaway') {
             return;
         }
